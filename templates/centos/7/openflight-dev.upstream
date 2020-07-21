@@ -1,0 +1,6 @@
+[openflight-dev]
+name=openflight-dev
+baseurl=https://repo.openflighthpc.org/openflight-dev/centos/$releasever/$basearch/
+enabled=0
+#gpgkey=https://repo.openflighthpc.org/openflight-dev/centos/$releasever/openflighthpc-gpg-key
+gpgcheck=0
