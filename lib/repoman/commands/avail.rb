@@ -32,10 +32,10 @@ module Repoman
     class Avail < Command
       def run
         Config.search_paths.each do |path|
-          repofiles = Dir[path + "/templates/#{distro}/*"].reject do |fn|
+          repofiles = Dir[path + "/repolists/#{distro}/*"].reject do |fn|
             File.directory?(fn)
           end.map do |item|
-            item.sub(/^.*\/templates\//, '')
+            item.sub(/^.*\/repolists\//, '')
           end.sort
           puts "Available for #{Paint[distro_name, :bright, :green]} in: #{path}\n\n"
           if repofiles.empty?

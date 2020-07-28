@@ -49,7 +49,7 @@ module Repoman
       def client_conf
         @client_conf ||=
           options.file || File.join(
-            Config.template_root, "local-#{distro}.repo"
+            Config.repolist_root, "local-#{distro}.repo"
           )
       end
 

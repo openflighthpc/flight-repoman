@@ -36,11 +36,11 @@ module Repoman
 
     def find(file)
       Config.search_paths.each do |path|
-        f = "#{path}/templates/#{distro}/#{file}"
+        f = "#{path}/repolists/#{distro}/#{file}"
         return f if File.exist?(f)
       end
       paths = Config.search_paths.map do |p|
-        "#{p}/templates/#{distro}"
+        "#{p}/repolists/#{distro}"
       end.join(', ')
       raise "#{file} does not exist in search paths: #{paths}"
     end

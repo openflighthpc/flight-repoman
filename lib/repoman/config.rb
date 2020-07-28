@@ -90,21 +90,21 @@ module Repoman
           'search_paths',
           default: [
             Config.root,
-            template_root
+            repolist_root
           ]
         )
       end
 
-      def template_root
-        @template_root ||= data.fetch(
-          'template_root',
+      def repolist_root
+        @repolist_root ||= data.fetch(
+          'repolist_root',
           default: File.join(ENV.fetch('flight_ROOT', '/opt/flight'), 'var', 'lib', 'repoman')
         )
       end
 
       def distros
         @distros ||= Config.search_paths.map do |p|
-          Dir["#{p}/templates/*"].select do |f|
+          Dir["#{p}/repolists/*"].select do |f|
             File.directory?(f)
           end.map(&File.method(:basename))
         end.flatten

@@ -70,13 +70,13 @@ module Repoman
 
     command :generate do |c|
       cli_syntax(c, 'FILE DISTRO REPOLIST...')
-      c.summary = 'Create a repository config file from available templates'
+      c.summary = 'Create a repository config file from available repolists'
       c.action Commands, :generate
       c.description = <<EOF
 Specify the output FILE to contain the generated repository config.
 
 Input repository files are searched from the DISTRO subdirectory of
-all template directories. Possible distros are:
+all repolist directories. Possible distros are:
 
   #{Config.distros.join("\n  ")}
 

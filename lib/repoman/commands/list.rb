@@ -93,7 +93,7 @@ module Repoman
       def client_conf_file
         @client_conf_file ||=
           options.file || File.join(
-            Config.template_root, "local-#{distro}.repo"
+            Config.repolist_root, "local-#{distro}.repo"
           )
       end
 
