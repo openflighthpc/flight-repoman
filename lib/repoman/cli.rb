@@ -69,33 +69,115 @@ module Repoman
     end
 
     command :generate do |c|
-      cli_syntax(c, 'FILE DISTRO REPO...')
-      c.summary = 'Set up client repo config files'
+      cli_syntax(c, 'FILE DISTRO REPOLIST...')
+      c.summary = 'Create a repository config file from available templates'
       c.action Commands, :generate
       c.description = <<EOF
-Set up client repo config files.
+Specify the output FILE to contain the generated repository config.
+
+Input repository files are searched from the DISTRO subdirectory of
+all template directories. Possible distros are:
+
+  #{Config.distros.join("\n  ")}
+
+Use the `show` command to list available repository fils.
 EOF
     end
 
-    command :mirror do |c|
-      cli_syntax(c, 'DISTRO REPOROOT CONFIGURL [REPO...]')
-      c.summary = 'Clone upstream repo'
-      c.action Commands, :mirror
-      c.option '--custom', 'Setup a custom repository'
-      c.option '--no-mirror', 'Do not update repository packages'
+    command :custom do |c|
+      cli_syntax(c, 'OPERATION DISTRO [NAME]')
+      c.summary = "Manage custom repositories"
+      c.action Commands, :custom
+      c.option '--root DIR', String, "Specify an alternative repo root (default: #{Config.repo_root})"
+      c.option '--url URL', String, "Specify an alternative local repo URL base (default: #{Config.repo_url})"
+      c.option '--file FILE', String, "Specify an alternative client repository configuration file"
+      c.description = <<EOF
+Perform an OPERATION on a custom repository, either 'create' or 'remove'.
+
+NAME defaults to 'custom'.
+
+On creation, create a repository skeleton if it doesn't exist and add
+the custom repository to the client repository configuration.
+
+On removal, remove the custom repository from the client repository
+configuration.
+EOF
+    end
+
+    command :create do |c|
+      cli_syntax(c, 'DISTRO REPOLIST...')
+      c.summary = 'Create a mirror of repositories held in a repository list'
+      c.action Commands, :create
+      c.option '--root DIR', String, "Specify an alternative repo root (default: #{Config.repo_root})"
+      c.option '--url URL', String, "Specify an alternative local repo URL base (default: #{Config.repo_url})"
+      c.option '--file FILE', String, "Specify an alternative client repository configuration file" 
+      c.option '--no-sync', 'Do not update/mirror repository packages'
+      c.option '--no-meta', 'Do not create repository metadata'
+      c.option '--no-config', 'Do not add to the client repository configuration'
+      c.description = <<EOF
+Create a mirror of repositories held in one or more specified
+REPOLISTs for DISTRO.
+
+Specify the --no-config to perform mirroring, but skip addition of the
+repository to the client repository configuration.
+
+Skip the creation of metadata by specifying the --no-meta option.
+EOF
+    end
+
+    command :remove do |c|
+      cli_syntax(c, 'DISTRO REPO...')
+      c.summary = 'Remove one or more repository mirrors from the client repository configuration'
+      c.action Commands, :remove
+      c.option '--file FILE', String, "Specify an alternative client repository configuration file"
+      c.description = <<EOF
+Remove one or more repository definitions from the client repository configuration.
+
+Note: this operation will not remove any existing mirrored files.
+EOF
+    end
+
+    command :refresh do |c|
+      cli_syntax(c, 'DISTRO REPO...')
+      c.summary = 'Refresh one or more repository mirrors'
+      c.action Commands, :refresh
+      c.option '--root DIR', String, "Specify an alternative repo root (default: #{Config.repo_root})"
+      c.option '--no-sync', 'Do not update/mirror repository packages'
       c.option '--no-meta', 'Do not update repository metadata'
-      c.option '--no-conf', 'Do not set up repository but update existing repos in reporoot'
       c.description = <<EOF
-Clone upstream repo.
+Refresh one or more specified upstream REPO mirrors for DISTRO.
+
+Perform a package sync but skip the update of metadata by specifying
+the --no-meta option.
+
+Perform an update of repository metadata but skip the package sync by
+specifying the --no-sync option.
 EOF
     end
 
-    command :show do |c|
-      cli_syntax(c)
-      c.summary = 'Show available repo config files'
-      c.action Commands, :show
+    command :avail do |c|
+      cli_syntax(c, '[DISTRO]')
+      c.summary = 'Show available repository files'
+      c.action Commands, :avail
       c.description = <<EOF
-Show available repo config files.
+Show available repository definitions.
+
+Optionally filter by DISTRO.
+EOF
+    end
+
+    command :list do |c|
+      cli_syntax(c, 'DISTRO')
+      c.summary = 'List mirrored and custom repositories'
+      c.action Commands, :list
+      c.option '--root DIR', String, "Specify an alternative repo root (default: #{Config.repo_root})"
+      c.option '--file FILE', String, "Specify an alternative client repository configuration file"
+      c.description = <<EOF
+List repositories that are present for DISTRO.
+
+The list includes all present mirrored and custom repositories and
+indicates which repositories are currently present in the client
+repository configuration.
 EOF
     end
   end

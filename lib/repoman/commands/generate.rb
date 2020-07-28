@@ -42,7 +42,10 @@ module Repoman
         end
         FileUtils.mkdir_p(File.dirname(outfile))
         File.write(outfile, content)
-        STDERR.puts "The file(s) #{sourcefiles.join(' ')} have been saved to #{outfile}"
+        puts "Repository configuration created: #{outfile}\n\nIncorporated:"
+        sourcefiles.each do |f|
+          puts "  #{f}"
+        end
       end
 
       def distro

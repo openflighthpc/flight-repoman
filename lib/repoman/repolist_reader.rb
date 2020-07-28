@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2020-present Alces Flight Ltd.
 #
@@ -25,10 +24,50 @@
 # For more information on Flight Repository Manager, please visit:
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
-source 'https://rubygems.org'
+require_relative 'repo'
 
-gem 'commander-openflighthpc', '~> 1.1.0'
-gem 'tty-table', git: 'https://github.com/piotrmurach/tty-table', ref: 'fcd968c'
-gem 'tty-prompt'
-gem 'tty-config'
-gem 'xdg', git: 'https://github.com/bkuhlmann/xdg', tag: '3.1.0'
+module Repoman
+  class RepolistReader
+    attr_accessor :repos, :fname
+
+    def initialize(fname, header = "")
+      @fname = fname
+      @repos = []
+      @header = header
+      load
+    end
+
+    def include?(name)
+      @repos.any? do |r|
+        r.name == name
+      end
+    end
+
+    def each(&block)
+      @repos.each(&block)
+    end
+
+    private
+    def load
+      name = nil
+      metadata = ""
+      baseurl = nil
+      if File.exists?(fname)
+        File.readlines(fname).each do |l|
+          if l =~ /^\[(.*)\]/
+            @repos << Repo.new(name, metadata, baseurl) unless name.nil?
+            name = ($1 == 'main' ? nil : $1)
+            metadata = ""
+          elsif !name.nil?
+            if l =~ /^baseurl=(.*)/
+              baseurl = $1
+            elsif l !~ /^$/ && l !~ /^name=/
+              metadata << l
+            end
+          end
+        end
+        @repos << Repo.new(name, metadata, baseurl) unless name.nil?
+      end
+    end
+  end
+end

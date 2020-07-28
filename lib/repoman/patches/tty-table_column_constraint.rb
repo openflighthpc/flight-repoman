@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2020-present Alces Flight Ltd.
 #
@@ -25,10 +24,37 @@
 # For more information on Flight Repository Manager, please visit:
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
-source 'https://rubygems.org'
+# Allow ColumnConstraint to be disabled
+class TTY::Table::ColumnConstraint
+  class << self
+    attr_accessor :rotate
+  end
+  self.rotate = false
 
-gem 'commander-openflighthpc', '~> 1.1.0'
-gem 'tty-table', git: 'https://github.com/piotrmurach/tty-table', ref: 'fcd968c'
-gem 'tty-prompt'
-gem 'tty-config'
-gem 'xdg', git: 'https://github.com/bkuhlmann/xdg', tag: '3.1.0'
+  def enforce
+    assert_minimum_width
+    padding = renderer.padding
+
+    if natural_width <= renderer.width
+      if renderer.resize
+        expand_column_widths
+      else
+        renderer.column_widths.map do |width|
+          padding.left + width + padding.right
+        end
+      end
+    else
+      if renderer.resize
+        shrink
+      else
+        if self.class.rotate == true
+          rotate
+        else
+          renderer.column_widths.map do |width|
+            padding.left + width + padding.right
+          end
+        end
+      end
+    end
+  end
+end

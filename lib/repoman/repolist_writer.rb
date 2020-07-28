@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2020-present Alces Flight Ltd.
 #
@@ -25,10 +24,36 @@
 # For more information on Flight Repository Manager, please visit:
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
-source 'https://rubygems.org'
+require_relative 'repolist_reader'
 
-gem 'commander-openflighthpc', '~> 1.1.0'
-gem 'tty-table', git: 'https://github.com/piotrmurach/tty-table', ref: 'fcd968c'
-gem 'tty-prompt'
-gem 'tty-config'
-gem 'xdg', git: 'https://github.com/bkuhlmann/xdg', tag: '3.1.0'
+module Repoman
+  class RepolistWriter < RepolistReader
+    def add(repo)
+      raise "invalid repo name: main" if repo.name == 'main'
+      @repos << repo
+      save
+    end
+
+    def remove(name)
+      raise "invalid repo name: main" if name == 'main'
+      @repos.reject! do |r|
+        r.name == name
+      end
+      save
+    end
+
+    private
+    def save
+      s = ""
+      s << @header
+      @repos.each do |r|
+        s << "[#{r.name}]\n"
+        s << "name=#{r.name}\n"
+        s << "baseurl=#{r.baseurl}\n"
+        s << r.metadata
+        s << "\n"
+      end
+      File.write(fname, s)
+    end
+  end
+end

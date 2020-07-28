@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 #==============================================================================
 # Copyright (C) 2020-present Alces Flight Ltd.
 #
@@ -25,10 +24,38 @@
 # For more information on Flight Repository Manager, please visit:
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
-source 'https://rubygems.org'
+require_relative '../command'
+require_relative '../config'
+require_relative '../repolist_writer'
 
-gem 'commander-openflighthpc', '~> 1.1.0'
-gem 'tty-table', git: 'https://github.com/piotrmurach/tty-table', ref: 'fcd968c'
-gem 'tty-prompt'
-gem 'tty-config'
-gem 'xdg', git: 'https://github.com/bkuhlmann/xdg', tag: '3.1.0'
+module Repoman
+  module Commands
+    class Remove < Command
+      def run
+        w = RepolistWriter.new(client_conf)
+        repos.each do |repo|
+          next if !w.include?(repo)
+          w.remove(repo)
+        end
+        puts "\nUpdated client repository configuration:\n\n"
+        puts "  #{w.fname}"
+      end
+
+      private
+      def distro
+        @distro ||= args[0]
+      end
+
+      def client_conf
+        @client_conf ||=
+          options.file || File.join(
+            Config.template_root, "local-#{distro}.repo"
+          )
+      end
+
+      def repos
+        @repos ||= args[1..-1]
+      end
+    end
+  end
+end

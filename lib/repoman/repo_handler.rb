@@ -34,17 +34,13 @@ module Repoman
       @distro = distro
     end
 
-    def distro_path
-      @distro_path ||= distro.split(/(\d+)/).join('/')
-    end
-
     def find(file)
       Config.search_paths.each do |path|
-        f = "#{path}/templates/#{distro_path}/#{file}"
+        f = "#{path}/templates/#{distro}/#{file}"
         return f if File.exist?(f)
       end
       paths = Config.search_paths.map do |p|
-        "#{p}/templates/#{distro_path}"
+        "#{p}/templates/#{distro}"
       end.join(', ')
       raise "#{file} does not exist in search paths: #{paths}"
     end

@@ -25,8 +25,12 @@
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
 require_relative 'commands/generate'
-require_relative 'commands/mirror'
-require_relative 'commands/show'
+require_relative 'commands/avail'
+require_relative 'commands/create'
+require_relative 'commands/custom'
+require_relative 'commands/list'
+require_relative 'commands/refresh'
+require_relative 'commands/remove'
 
 module Repoman
   module Commands

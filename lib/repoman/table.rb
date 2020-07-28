@@ -24,21 +24,61 @@
 # For more information on Flight Repository Manager, please visit:
 # https://github.com/openflighthpc/flight-repoman
 #==============================================================================
-require_relative '../command'
-require_relative '../config'
+require 'tty-table'
+require_relative 'patches/tty-table_column_constraint'
 
 module Repoman
-  module Commands
-    class Show < Command
-      def run
-        Config.search_paths.each do |path|
-          repofiles = Dir[path + '/templates/**/*'].reject do |fn|
-            File.directory?(fn)
-          end.map do |item|
-            item.sub(/^.*\/templates\//, '')
-          end
-          puts "Available in #{path}: #{repofiles}"
+  class Table
+    DEFAULT_PADDING = [0,1].freeze
+
+    class << self
+      def build(&block)
+        new.build(&block)
+      end
+
+      def emit(&block)
+        build(&block).emit
+      end
+    end
+
+    def initialize
+      @table = TTY::Table.new(header: [''])
+      @table.header.fields.clear
+      @padding = DEFAULT_PADDING
+    end
+
+    def build(&block)
+      instance_eval(&block)
+      self
+    end
+
+    def emit
+      puts @table.render(
+        :unicode,
+        {}.tap do |o|
+          o[:padding] = @padding unless @padding.nil?
+          o[:multiline] = true
         end
+      )
+    end
+
+    def headers(*titles)
+      titles.each_with_index do |v, i|
+        @table.header[i] = v
+      end
+    end
+
+    def padding(*pads)
+      @padding = pads.length == 1 ? pads.first : pads
+    end
+
+    def row(*vals)
+      @table << vals
+    end
+
+    def rows(*vals)
+      vals.each do |r|
+        @table << r
       end
     end
   end

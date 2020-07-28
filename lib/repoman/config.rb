@@ -102,6 +102,28 @@ module Repoman
         )
       end
 
+      def distros
+        @distros ||= Config.search_paths.map do |p|
+          Dir["#{p}/templates/*"].select do |f|
+            File.directory?(f)
+          end.map(&File.method(:basename))
+        end.flatten
+      end
+
+      def repo_url
+        @repo_url ||= data.fetch(
+          'repo_url',
+          default: 'http://localhost/repos'
+        )
+      end
+
+      def repo_root
+        @repo_root ||= data.fetch(
+          'repo_root',
+          default: '/opt/repos'
+        )
+      end
+
       private
       def xdg_config
         @xdg_config ||= XDG::Config.new
