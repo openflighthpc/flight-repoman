@@ -53,6 +53,7 @@ module Repoman
         s << r.metadata
         s << "\n"
       end
+      FileUtils.mkdir_p(File.dirname(fname))
       File.write(fname, s)
     end
   end
