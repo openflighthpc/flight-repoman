@@ -80,7 +80,7 @@ all repolist directories. Possible distros are:
 
   #{Config.distros.join("\n  ")}
 
-Use the `show` command to list available repository fils.
+Use the `#{PROGRAM_NAME} avail` command to list available repository lists.
 EOF
     end
 
